@@ -7,10 +7,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import useOnlineStatus from "./useOnlineStatus";
 
 const App = () => {
-  const [onlineUserCount, setOnlineUserCount] = useState<any[]>([]);
+  const [onlineUserCount, setOnlineUserCount] = useState<any[]>(
+    JSON.parse(localStorage.getItem("data") || "")
+  );
   const [error, setError] = useState<null | string>(null);
+  const isOnline = useOnlineStatus();
+
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -50,6 +55,12 @@ const App = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!isOnline) {
+      localStorage.setItem("data", JSON.stringify(onlineUserCount));
+    }
+  }, [isOnline]);
 
   console.log(onlineUserCount);
 
