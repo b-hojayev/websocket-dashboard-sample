@@ -1,86 +1,46 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AreaChart,
   Area,
-  XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  {
-    name: "Page A",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: "Page B",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
-  },
-  {
-    name: "Page C",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: "Page D",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
-  },
-  {
-    name: "Page E",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
-  },
-  {
-    name: "Page F",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
-  },
-  {
-    name: "Page G",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
-  },
-];
-
-interface Message {
-  type: string;
-  message: string;
-}
-
 const App = () => {
+  const [onlineUserCount, setOnlineUserCount] = useState<any[]>([]);
+  const [error, setError] = useState<null | string>("null");
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     socketRef.current = new WebSocket("ws://localhost:3000/dashboard");
 
     socketRef.current.onopen = () => {
+      // setError(null);
       console.log("Connected to server");
-
-      const helloMessage: Message = { type: "hello", message: "Hi server!" };
+      const helloMessage = { message: "Hi server!" };
       socketRef.current?.send(JSON.stringify(helloMessage));
     };
 
     socketRef.current.onmessage = (event: MessageEvent<string>) => {
+      setOnlineUserCount((prev) => {
+        if (prev.length > 20) {
+          return [...prev.slice(1), JSON.parse(event.data)];
+        } else {
+          return [...prev, JSON.parse(event.data)];
+        }
+      });
       console.log("Message from server:", event.data);
     };
 
     socketRef.current.onerror = (error) => {
       console.error("WebSocket error:", error);
+      setError("Something went wrong please, try again");
     };
 
     socketRef.current.onclose = () => {
+      setError("You disconnected from server...");
       console.log("Disconnected from server");
     };
 
@@ -91,21 +51,20 @@ const App = () => {
     };
   }, []);
 
-  const sendData = () => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      const chatMessage: Message = { type: "chat", message: "Hello again!" };
-      socketRef.current.send(JSON.stringify(chatMessage));
-    }
+  console.log(onlineUserCount);
+
+  const handleConnect = async () => {
+    window.location.reload();
   };
 
   return (
-    <main className="w-full min-h-screen flex items-center justify-center">
+    <main className="w-full min-h-screen flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl h-[500px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             width={500}
             height={400}
-            data={data}
+            data={onlineUserCount}
             margin={{
               top: 10,
               right: 30,
@@ -114,25 +73,28 @@ const App = () => {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
             <Area
               type="monotone"
-              dataKey="pv"
+              dataKey="onlineCount"
               stackId="1"
               stroke="#82ca9d"
               fill="#82ca9d"
             />
-            <Area
-              type="monotone"
-              dataKey="amt"
-              stackId="1"
-              stroke="#ffc658"
-              fill="#ffc658"
-            />
           </AreaChart>
         </ResponsiveContainer>
+      </div>
+
+      <div className="mt-6">
+        {error && (
+          <button
+            onClick={handleConnect}
+            className="bg-green-500 p-4 rounded-2xl text-white font-semibold cursor-pointer hover:bg-green-400"
+          >
+            Try again
+          </button>
+        )}
       </div>
     </main>
   );

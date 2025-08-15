@@ -21,6 +21,14 @@ app.ws("/dashboard", function (ws, req) {
   ws.on("close", (code, reason) => {
     console.log("Closed...");
   });
+
+  setInterval(() => {
+    ws.send(
+      JSON.stringify({
+        onlineCount: Math.round(Math.random() * 1000),
+      })
+    );
+  }, 2000);
 });
 
 app.listen(port, () => {
