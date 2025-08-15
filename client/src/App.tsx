@@ -10,14 +10,14 @@ import {
 
 const App = () => {
   const [onlineUserCount, setOnlineUserCount] = useState<any[]>([]);
-  const [error, setError] = useState<null | string>("null");
+  const [error, setError] = useState<null | string>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     socketRef.current = new WebSocket("ws://localhost:3000/dashboard");
 
     socketRef.current.onopen = () => {
-      // setError(null);
+      setError(null);
       console.log("Connected to server");
       const helloMessage = { message: "Hi server!" };
       socketRef.current?.send(JSON.stringify(helloMessage));

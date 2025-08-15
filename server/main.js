@@ -2,8 +2,6 @@ const express = require("express");
 const app = express();
 var expressWs = require("express-ws")(app);
 
-expressWs.getWss;
-
 const port = 3000;
 
 app.ws("/dashboard", function (ws, req) {
