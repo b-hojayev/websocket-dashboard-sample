@@ -88,12 +88,15 @@ const App = () => {
 
       <div className="mt-6">
         {error && (
-          <button
-            onClick={handleConnect}
-            className="bg-green-500 p-4 rounded-2xl text-white font-semibold cursor-pointer hover:bg-green-400"
-          >
-            Try again
-          </button>
+          <div className="flex flex-col gap-2 items-center">
+            <p className="text-red-500">{error}</p>
+            <button
+              onClick={handleConnect}
+              className="bg-green-500 p-4 rounded-2xl text-white font-semibold cursor-pointer hover:bg-green-400"
+            >
+              Try again
+            </button>
+          </div>
         )}
       </div>
     </main>
