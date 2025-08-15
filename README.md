@@ -24,12 +24,12 @@ A real-time dashboard application demonstrating WebSocket communication between 
 
 ```bash
 cd server
-cd npm i
+npm i
 ```
 
 ```bash
 cd client
-cd npm i
+npm i
 ```
 
 3. Start the server:
